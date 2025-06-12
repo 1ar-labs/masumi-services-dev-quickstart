@@ -3,7 +3,7 @@
 # exit on error
 set -e
 
-echo "Starting Masumi Registry Service..."
+echo "Starting Masumi Registry Service v2..."
 
 # check if DATABASE_URL is set
 if [ -z "$DATABASE_URL" ]; then

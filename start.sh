@@ -32,7 +32,7 @@ echo "Running database migrations..."
 echo "Checking database state..."
 if npm run prisma:migrate 2>&1 | grep -q "P3005"; then
     echo "Database already has tables. Pushing schema instead of running migrations..."
-    npx prisma db push --skip-seed --accept-data-loss
+    npx prisma db push --accept-data-loss
     echo "Schema push completed."
 else
     echo "Running migrations..."

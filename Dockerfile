@@ -7,5 +7,8 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 # railway will provide DATABASE_URL and other env vars
 EXPOSE 3000
 
-# run migrations and start the service
-CMD ["sh", "-c", "npm run prisma:migrate && npm run prisma:seed && npm start"]
+# add a startup script with retries
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]

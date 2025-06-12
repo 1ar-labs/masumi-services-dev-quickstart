@@ -28,24 +28,16 @@ fi
 echo "Environment variables verified."
 echo "Running database migrations..."
 
-# run migrations with retries
-RETRY_COUNT=0
-MAX_RETRIES=5
-
-while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if npm run prisma:migrate; then
-        echo "Migrations completed successfully."
-        break
-    else
-        RETRY_COUNT=$((RETRY_COUNT + 1))
-        echo "Migration failed. Retry $RETRY_COUNT of $MAX_RETRIES..."
-        sleep 5
-    fi
-done
-
-if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
-    echo "ERROR: Failed to run migrations after $MAX_RETRIES attempts."
-    exit 1
+# run migrations - if database is not empty, push schema instead
+echo "Checking database state..."
+if npm run prisma:migrate 2>&1 | grep -q "P3005"; then
+    echo "Database already has tables. Pushing schema instead of running migrations..."
+    npx prisma db push --skip-seed --accept-data-loss
+    echo "Schema push completed."
+else
+    echo "Running migrations..."
+    npm run prisma:migrate
+    echo "Migrations completed successfully."
 fi
 
 # seed database

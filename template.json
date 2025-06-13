@@ -1,0 +1,97 @@
+{
+  "name": "Masumi Services Dev Quickstart",
+  "description": "Deploy Masumi Registry and Payment services with PostgreSQL automatically",
+  "tags": ["typescript", "blockchain", "cardano", "ai-agents", "payments"],
+  "author": "1ar-labs",
+  "repo": "https://github.com/1ar-labs/masumi-services-dev-quickstart",
+  "services": [
+    {
+      "name": "postgres-registry",
+      "type": "database",
+      "engine": "postgres",
+      "variables": {
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": {
+          "generator": "secret",
+          "length": 32
+        },
+        "POSTGRES_DB": "registry"
+      }
+    },
+    {
+      "name": "postgres-payment", 
+      "type": "database",
+      "engine": "postgres",
+      "variables": {
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": {
+          "generator": "secret",
+          "length": 32
+        },
+        "POSTGRES_DB": "payment"
+      }
+    },
+    {
+      "name": "masumi-registry",
+      "type": "web",
+      "source": {
+        "repo": "https://github.com/1ar-labs/masumi-services-dev-quickstart",
+        "branch": "main"
+      },
+      "build": {
+        "builder": "dockerfile",
+        "dockerfilePath": "Dockerfile.registry"
+      },
+      "variables": {
+        "DATABASE_URL": "${{postgres-registry.DATABASE_URL}}",
+        "ADMIN_KEY": {
+          "generator": "secret",
+          "length": 64
+        },
+        "BLOCKFROST_API_KEY_PREPROD": {
+          "type": "prompt",
+          "description": "Enter your Blockfrost Preprod API key (get one free at https://blockfrost.io)"
+        },
+        "SEED_ONLY_IF_EMPTY": "TRUE",
+        "PORT": "3000"
+      },
+      "healthcheck": {
+        "path": "/api/v1/health",
+        "interval": 30,
+        "timeout": 10,
+        "retries": 3
+      },
+      "dependsOn": ["postgres-registry"]
+    },
+    {
+      "name": "masumi-payment",
+      "type": "web", 
+      "source": {
+        "repo": "https://github.com/1ar-labs/masumi-services-dev-quickstart",
+        "branch": "main"
+      },
+      "build": {
+        "builder": "dockerfile",
+        "dockerfilePath": "Dockerfile.payment"
+      },
+      "variables": {
+        "DATABASE_URL": "${{postgres-payment.DATABASE_URL}}",
+        "ADMIN_KEY": "${{masumi-registry.ADMIN_KEY}}",
+        "ENCRYPTION_KEY": {
+          "generator": "secret",
+          "length": 64
+        },
+        "BLOCKFROST_API_KEY_PREPROD": "${{masumi-registry.BLOCKFROST_API_KEY_PREPROD}}",
+        "SEED_ONLY_IF_EMPTY": "TRUE",
+        "PORT": "3001"
+      },
+      "healthcheck": {
+        "path": "/api/v1/health",
+        "interval": 30,
+        "timeout": 10,
+        "retries": 3
+      },
+      "dependsOn": ["postgres-payment", "masumi-registry"]
+    }
+  ]
+}

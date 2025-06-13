@@ -1,0 +1,14 @@
+# payment service dockerfile
+FROM ghcr.io/masumi-network/masumi-payment-service:0.18.0
+
+# install curl for healthcheck
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# railway will provide DATABASE_URL and other env vars
+EXPOSE 3001
+
+# add a startup script with retries for payment service
+COPY start-payment.sh /start-payment.sh
+RUN chmod +x /start-payment.sh
+
+CMD ["/start-payment.sh"]

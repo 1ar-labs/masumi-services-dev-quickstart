@@ -1,6 +1,16 @@
-# Masumi Services Docker Compose Setup
+# Masumi Services Dev Quickstart
 
-This repository contains a Docker Compose configuration to run both the Masumi Registry Service and Masumi Payment Service together and configure the databases
+## 🚀 One-Click Deploy on Railway
+
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template?template=https://github.com/1ar-labs/masumi-services-dev-quickstart)
+
+**Click the button above for fully automated deployment!** No manual setup required - just enter your Blockfrost API key.
+
+---
+
+## Local Development with Docker Compose
+
+This repository contains a Docker Compose configuration to run both the Masumi Registry Service and Masumi Payment Service together locally
 
 ## Prerequisites
 
